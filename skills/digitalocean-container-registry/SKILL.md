@@ -107,12 +107,17 @@ because they are the usual cause of surprising storage usage.
 
 ## Create a registry
 
-1. `docr-options` returns `available_regions` and `subscription_tiers`
-   (slug, monthly price, storage, repository and registry limits). Use it
-   instead of quoting prices from memory.
+1. `docr-options` returns `available_regions` and `subscription_tiers`.
+   Each tier has `monthly_price_in_cents` (divide by 100 for dollars),
+   `included_storage_bytes`, and `included_repositories` where **`0` means
+   unlimited** (Professional), not zero. Use it instead of quoting prices
+   from memory.
 2. `docr-validate-name` with the proposed `Name`. Names are globally unique
    across all DigitalOcean customers, 1–63 chars, lowercase letters, numbers
-   and hyphens, start with a letter, end with a letter or number.
+   and hyphens, start with a letter, end with a letter or number. If this
+   tool returns **403**, the OAuth grant lacks the scope for it: check the
+   rules above yourself, tell the user availability could not be verified,
+   and let `docr-create` report a conflict.
 3. If the account already has a registry, call `docr-subscription-get`: only
    Professional allows more than one registry. Otherwise `docr-create` fails.
 4. Price first: show the chosen `Region`, `SubscriptionTierSlug`, its monthly
@@ -140,12 +145,16 @@ paying for the plan until `docr-subscription-update` changes it.
 ## Subscription plan
 
 - `docr-subscription-get` has no arguments: the plan is **per account**, not
-  per registry. Changing it affects every registry.
-- `docr-options` lists the tiers with current pricing and limits.
+  per registry. Changing it affects every registry. In the response,
+  `included_repositories: 0` means unlimited.
+- `docr-options` lists the tiers with current pricing and, for this account,
+  whether each tier is **`eligible`**. An ineligible tier carries
+  `eligibility_reasons` such as `OverRegistryLimit`, `OverRepositoryLimit`,
+  or `OverStorageLimit`. Check this before proposing a change.
 - `docr-subscription-update` (`TierSlug`): price first, confirm, then call.
-  Downgrades fail when current usage exceeds the target plan's storage,
-  repository, or registry limits; point the user to
-  **digitalocean-container-registry-cleanup** or to deleting registries.
+  If the target tier is not eligible, explain the reason and point the user
+  to **digitalocean-container-registry-cleanup** (storage, repositories) or
+  to deleting registries (`OverRegistryLimit`) before retrying.
 - Storage over the plan quota is billed per GiB per day; untagged images count
   toward usage.
 

@@ -140,8 +140,9 @@ Work read-first, in this order:
    `registry.digitalocean.com/<registry>/<repository>:<tag>`; a missing
    `<registry>` segment is a frequent cause.
 2. **Is the registry read-only right now?** `docr-garbage-collection-get`.
-   During garbage collection pushes fail; pulls still work. A failing CI
-   push during GC is expected, not an auth problem.
+   A 404 "did not find an active garbage collection" means no: move on. If
+   a GC is running, pushes fail until it finishes while pulls still work; a
+   failing CI push during GC is expected, not an auth problem.
 3. **Is the secret present and fresh?** For DOKS, `kubectl get secret -n
    <ns>` should show the registry secret; `kubectl describe pod` shows the
    exact error. `unauthorized` or `denied` with an existing secret usually

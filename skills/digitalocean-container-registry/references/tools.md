@@ -8,6 +8,12 @@ schema.
 Tools are in the `docr` service. Through the hosted DigitalOcean MCP server
 invoke them as `docr/<tool>`.
 
+`invoke_tool`'s optional `projection` selects top-level fields of structured
+output (for example `["meta"]` or `["manifests"]`). It cannot reach into
+array elements, so `manifests.digest` returns nothing; select the whole array
+instead. Errors come back as text: `api error: <METHOD> <url>: <status>
+(request "<id>") <message>`; quote the request id when escalating.
+
 Risk column is the tier from the skill's safety rules: **Read**, **Confirm**,
 **Secret**, **Price**, **Destructive**.
 
@@ -16,9 +22,9 @@ Risk column is the tier from the skill's safety rules: **Read**, **Confirm**,
 | Tool | Arguments | Risk | Notes |
 | --- | --- | --- | --- |
 | `docr-list` | none | Read | All registries on the account. |
-| `docr-get` | `RegistryName` (req) | Read | Name, region, created_at, storage_usage_bytes. |
-| `docr-options` | none | Read | `available_regions` and `subscription_tiers` (slug, price, limits). |
-| `docr-validate-name` | `Name` (req) | Read | Availability check. Names are globally unique. |
+| `docr-get` | `RegistryName` (req) | Read | Name, region, created_at, storage_usage_bytes. Unknown name → 404 "registry does not exist". |
+| `docr-options` | none | Read | `available_regions`; `subscription_tiers` with `monthly_price_in_cents`, `included_storage_bytes`, `included_repositories` (`0` = unlimited), and per-account `eligible` / `eligibility_reasons` (`OverRegistryLimit`, `OverRepositoryLimit`, `OverStorageLimit`). |
+| `docr-validate-name` | `Name` (req) | Read | Availability check. Names are globally unique. May return 403 when the OAuth grant lacks the scope; fall back to local name rules. |
 | `docr-create` | `Name` (req), `SubscriptionTierSlug`, `Region` | Price | Region is permanent. Second registry requires Professional. |
 | `docr-delete` | `RegistryName` (req) | Destructive | Destroys all repositories and images. Irreversible. |
 | `docr-docker-credentials` | `RegistryName` (req), `ReadWrite` (bool, default false), `ExpirySeconds` (number, no expiry if unset) | Secret | Returns a Docker `config.json` with an embedded token. Never print it. Credentials are account-wide. |
@@ -45,7 +51,7 @@ Risk column is the tier from the skill's safety rules: **Read**, **Confirm**,
 | Tool | Arguments | Risk | Notes |
 | --- | --- | --- | --- |
 | `docr-garbage-collection-start` | `RegistryName` (req), `Type` | Destructive | Registry becomes read-only for the duration. `Type` values: `untagged manifests only`, `unreferenced blobs only`, `untagged manifests and unreferenced blobs`. Omitted = `unreferenced blobs only`, which does **not** remove untagged manifests; pass the type explicitly. |
-| `docr-garbage-collection-get` | `RegistryName` (req) | Read | The currently active GC, or an error/empty result if none. |
+| `docr-garbage-collection-get` | `RegistryName` (req) | Read | The currently active GC. When none is running it returns **404 "did not find an active garbage collection"**; that is the normal idle state, not a failure. |
 | `docr-garbage-collection-list` | `RegistryName` (req), `Page` (1), `PerPage` (20) | Read | History with status, blobs_deleted, freed_bytes. |
 | `docr-garbage-collection-update` | `RegistryName` (req), `GarbageCollectionUUID` (req), `Cancel` (req, bool) | Confirm | Only supported update is `Cancel: true`. |
 

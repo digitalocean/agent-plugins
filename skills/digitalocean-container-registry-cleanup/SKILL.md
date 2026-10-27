@@ -64,15 +64,18 @@ Rules specific to cleanup:
 1. `docr-get` (`RegistryName`): `storage_usage_bytes` is the billed number.
 2. `docr-subscription-get`: plan quota and included storage, to show how far
    over the user is.
-3. `docr-garbage-collection-get`: if a GC is already **running**, stop here;
-   deletes during GC are rejected and a second GC cannot start. Report its
-   status and offer to wait or cancel.
+3. `docr-garbage-collection-get`. A **404 "did not find an active garbage
+   collection"** is the normal answer when nothing is running: treat it as
+   "clear to proceed", not as a failure. If it returns a GC with status
+   `requested` or `running`, stop here; deletes during GC are rejected and a
+   second GC cannot start. Report its status and offer to wait or cancel.
 
 ### 2. Find candidates
 
 1. `docr-repository-list`: note `tag_count`, `manifest_count` and
-   `latest_manifest` per repository. `manifest_count > tag_count` means
-   untagged manifests exist.
+   `latest_manifest` per repository. `manifest_count > tag_count` guarantees
+   untagged manifests exist; the reverse does not rule them out (one manifest
+   can hold many tags), so always confirm with the manifest list.
 2. For each repository of interest, `docr-repository-manifest-list`. Each
    manifest has `digest`, `tags` (may be empty), `compressed_size_bytes`,
    `updated_at`. Classify:
