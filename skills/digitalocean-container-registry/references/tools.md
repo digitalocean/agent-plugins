@@ -25,9 +25,9 @@ Risk column is the tier from the skill's safety rules: **Read**, **Confirm**,
 | `docr-get` | `RegistryName` (req) | Read | Name, region, created_at, storage_usage_bytes. Unknown name → 404 "registry does not exist". |
 | `docr-options` | none | Read | `available_regions`; `subscription_tiers` with `monthly_price_in_cents`, `included_storage_bytes`, `included_repositories` (`0` = unlimited), and per-account `eligible` / `eligibility_reasons` (`OverRegistryLimit`, `OverRepositoryLimit`, `OverStorageLimit`). |
 | `docr-validate-name` | `Name` (req) | Read | Availability check. Names are globally unique. May return 403 when the OAuth grant lacks the scope; fall back to local name rules. |
-| `docr-create` | `Name` (req), `SubscriptionTierSlug`, `Region` | Price | Region is permanent. Second registry requires Professional. |
+| `docr-create` | `Name` (req), `SubscriptionTierSlug` (effectively required), `Region` | Price | Omitting `SubscriptionTierSlug` sends an empty slug → 422 "invalid subscription tier slug"; always pass one. Region is permanent. Second registry requires Professional. Can exceed the client timeout (`context deadline exceeded`) yet succeed; check `docr-list` before retrying. |
 | `docr-delete` | `RegistryName` (req) | Destructive | Destroys all repositories and images. Irreversible. |
-| `docr-docker-credentials` | `RegistryName` (req), `ReadWrite` (bool, default false), `ExpirySeconds` (number, no expiry if unset) | Secret | Returns a Docker `config.json` with an embedded token. Never print it. Credentials are account-wide. |
+| `docr-docker-credentials` | `RegistryName` (req), `ReadWrite` (bool, default false), `ExpirySeconds` (number, no expiry if unset) | Secret | Returns a Docker `config.json` with an embedded account-wide token. The output enters the session and tool logs, so treat it as exposed; prefer `doctl registries login` or the control panel. Last resort only, with a short expiry. |
 
 ## Repository
 

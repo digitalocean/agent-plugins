@@ -58,7 +58,7 @@ Tier every call before making it. Nothing is run silently.
 | --- | --- | --- |
 | Read | Run freely, no prompt | `docr-list`, `docr-get`, `docr-options`, `docr-validate-name`, `docr-subscription-get`, `docr-repository-list`, `docr-repository-tag-list`, `docr-repository-manifest-list`, `docr-garbage-collection-get`, `docr-garbage-collection-list` |
 | Confirm | Show the change, ask once | `docr-garbage-collection-update` (cancel) |
-| Secret | Confirm, then **never print the result** | `docr-docker-credentials` (see digitalocean-container-registry-access) |
+| Secret | Avoid; its output enters the conversation and tool logs | `docr-docker-credentials` (rules in digitalocean-container-registry-access) |
 | Price first | Show plan name, monthly price, quota, and that billing starts now; then confirm | `docr-create`, `docr-subscription-update` |
 | Destructive | List affected resources by name, state what is lost, require the user to confirm the exact name | `docr-delete`, `docr-repository-tag-delete`, `docr-repository-manifest-delete`, `docr-garbage-collection-start` |
 
@@ -122,9 +122,18 @@ because they are the usual cause of surprising storage usage.
    Professional allows more than one registry. Otherwise `docr-create` fails.
 4. Price first: show the chosen `Region`, `SubscriptionTierSlug`, its monthly
    price and quota, and that the region cannot be changed later. Confirm.
-5. `docr-create` (`Name`, optional `SubscriptionTierSlug`, optional `Region`).
-   When `SubscriptionTierSlug` is omitted the existing account plan applies.
-6. Hand off to **digitalocean-container-registry-access** so the user can log
+5. `docr-create` (`Name`, `SubscriptionTierSlug`, `Region`). **Always pass
+   `SubscriptionTierSlug`**: omitting it sends an empty slug and the API
+   returns 422 "invalid subscription tier slug". Use the current plan's slug
+   from `docr-subscription-get` unless the user is changing plans.
+6. The create call can take longer than the MCP client timeout and return
+   `context deadline exceeded` even though the registry **was created**. On a
+   timeout, run `docr-list` before retrying. Names are globally unique, so a
+   retry cannot create a duplicate, but if the first attempt succeeded the
+   retry fails with a name conflict; misreading that as "taken by someone
+   else" leads to picking a different name and creating a second registry
+   the user did not want.
+7. Hand off to **digitalocean-container-registry-access** so the user can log
    in and push.
 
 ## Delete a registry

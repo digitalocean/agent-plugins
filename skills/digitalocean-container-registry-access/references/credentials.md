@@ -15,6 +15,17 @@
 The `auth` value is a secret equivalent to an API token with registry access
 for the **whole account**. Handle the entire document as a secret.
 
+## Exposure
+
+When an agent calls this tool, the returned document enters the model's
+context and the client's tool-call history. Writing it to a file, a CI
+secret, or a Kubernetes secret through another tool call records it there as
+well. Treat any credential minted through MCP as exposed for its lifetime.
+That is why the skill prefers paths the user runs themselves (`doctl
+registries login`, control-panel **Download Docker Credentials**, DOKS
+integration) and reserves this tool for explicit requests with a short
+expiry.
+
 ## Arguments
 
 | Argument | Default | Guidance |
@@ -23,16 +34,19 @@ for the **whole account**. Handle the entire document as a secret.
 | `ReadWrite` | `false` | `true` only when pushing. Pull-only consumers (DOKS, App Platform, read replicas of CI) stay read-only. |
 | `ExpirySeconds` | unset = never expires | Always set one. Suggested: `3600` interactive push, `604800` (7 d) short-lived CI, `2592000` (30 d) maximum for CI. Non-expiring only on explicit request. |
 
-## Where the output goes
+## How each consumer should get credentials
 
-| Consumer | Placement | Notes |
+Preferred paths keep the secret out of the agent session entirely. The
+"minted via MCP" column applies only when the user explicitly asks for it.
+
+| Consumer | Preferred (user runs it) | If minted via MCP |
 | --- | --- | --- |
-| Local `docker` | `~/.docker/config.json` (merge `auths`, do not overwrite other registries) | Prefer `doctl registries login`, which does this for you. |
-| GitHub Actions | Repository/organisation secret, then write to `$HOME/.docker/config.json` in a step, or use `digitalocean/action-doctl` + `doctl registries login` with a `DIGITALOCEAN_ACCESS_TOKEN` secret | See the CI/CD how-to for the maintained example. |
-| Other CI | Provider secret store; same write-to-file pattern | Never `echo` the secret in logs; mask it if the provider supports masking. |
-| Kubernetes (manual) | `kubectl create secret generic <name> --from-file=.dockerconfigjson=<file> --type=kubernetes.io/dockerconfigjson`, then `imagePullSecrets` | `doctl registries kubernetes-manifest` produces the same secret named `registry-<registry>`. |
-| Kubernetes (DOKS integration) | None; the control panel manages the secret in every namespace | Preferred for DOKS. |
-| App Platform | None; set `image.registry_type: DOCR` in the app spec | No credential handling. |
+| Local `docker` | `doctl registries login` | User merges the output into `~/.docker/config.json` themselves (do not overwrite other registries' `auths`). |
+| GitHub Actions | `DIGITALOCEAN_ACCESS_TOKEN` secret + `digitalocean/action-doctl` + `doctl registries login --expiry-seconds 1200` in the job | User pastes the output into a repository secret; the job writes it to `$HOME/.docker/config.json`. Agent does not write it anywhere. |
+| Other CI | Same token + `doctl` pattern | User stores it in the provider's secret store; mask it in logs. |
+| Kubernetes (manual) | `doctl registries kubernetes-manifest \| kubectl apply -f -` (creates `registry-<registry>`) | User runs `kubectl create secret generic <name> --from-file=.dockerconfigjson=<file> --type=kubernetes.io/dockerconfigjson`, then sets `imagePullSecrets`. |
+| Kubernetes (DOKS integration) | Control panel → registry Settings → DigitalOcean Kubernetes integration | Not applicable. |
+| App Platform | `image.registry_type: DOCR` in the app spec | Not applicable. |
 
 ## Rotation
 
