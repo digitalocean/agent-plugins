@@ -15,6 +15,17 @@ platforms.
 The toolkit reads resources freely, asks for confirmation before making
 changes, and shows the price before creating billable resources.
 
+## Skills
+
+Skills are loaded automatically when a request matches their description.
+Each skill carries its own safety rules for the tools it uses.
+
+| Skill | Useful for |
+| --- | --- |
+| [digitalocean-container-registry](skills/digitalocean-container-registry/SKILL.md) | Create, inspect, and delete Container Registry (DOCR) registries; browse repositories, tags, and manifests; view or change the subscription plan |
+| [digitalocean-container-registry-cleanup](skills/digitalocean-container-registry-cleanup/SKILL.md) | Free registry storage safely: find untagged or stale images, delete tags/manifests, run and monitor garbage collection |
+| [digitalocean-container-registry-access](skills/digitalocean-container-registry-access/SKILL.md) | Docker credentials, pushing from workstations or CI, pulling from DOKS and App Platform, diagnosing `ImagePullBackOff` and auth errors |
+
 ## MCP server
 
 | Server       | Endpoint                           |
