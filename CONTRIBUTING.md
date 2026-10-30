@@ -46,27 +46,11 @@ When contributing new skills to this repository, follow these guidelines:
    wherever necessary, especially for destructive, sensitive, or cost-incurring
    operations.
 
-## Skill structure
-
-Each skill is a folder under [`skills/`](skills/) named in `service-job` format
-and containing a `SKILL.md`. Supporting material (tool references, examples) goes
-in a `references/` subfolder:
-
-```
-skills/
-  <service>-<job>/
-    SKILL.md
-    references/        # optional
-      tools.md
-```
-
 ## Skill template
 
-Start from [`templates/SKILL.md`](templates/SKILL.md). Copy it into a new
-`skills/<service>-<job>/` folder and fill in the sections; leave out any section
-that does not apply.
-
-Every `SKILL.md` begins with YAML frontmatter in this format:
+Start from [`templates/SKILL.md`](templates/SKILL.md): copy it into a new
+`skills/<service>-<job>/` folder and fill it in. Every `SKILL.md` begins with
+YAML frontmatter in this format:
 
 ```yaml
 ---
@@ -86,11 +70,3 @@ metadata:
 - `description` is what the agent matches against to auto-load the skill — make
   it specific and include trigger phrases.
 - `metadata.product` is the product slug (e.g., `container-registry`).
-
-## Before you open a pull request
-
-- `name` matches the folder name and uses `service-job`.
-- The skill follows the DO MCP discovery flow and does not hardcode schemas.
-- Safety rules cover every destructive, billable, or sensitive tool.
-- No secrets, tokens, customer data, or internal information.
-- Add the new skill to the **Skills** table in [`README.md`](README.md).
