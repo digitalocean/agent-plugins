@@ -12,7 +12,7 @@ When contributing new skills to this repository, follow these guidelines:
    - `service` represents the DigitalOcean product MCP (e.g., `droplet`,
      `database`, `apps`, `docr`).
    - `job` represents the specific workflow or task the skill covers (e.g.,
-     `troubleshoot`, `cleanup`, `access`).
+     `troubleshoot`).
 
 2. **Keep skills simple** — Add only essential skills covering commonly used
    tasks and workflows. Avoid creating skills for rarely used or overly specific
