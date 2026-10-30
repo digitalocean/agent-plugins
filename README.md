@@ -20,11 +20,9 @@ changes, and shows the price before creating billable resources.
 Skills are loaded automatically when a request matches their description.
 Each skill carries its own safety rules for the tools it uses.
 
-| Skill | Useful for |
-| --- | --- |
-| [docr-manage](skills/docr-manage/SKILL.md) | Create, inspect, and delete Container Registry (DOCR) registries; browse repositories, tags, and manifests; view or change the subscription plan |
-| [docr-cleanup](skills/docr-cleanup/SKILL.md) | Free registry storage safely: find untagged or stale images, delete tags/manifests, run and monitor garbage collection |
-| [docr-access](skills/docr-access/SKILL.md) | Docker credentials, pushing from workstations or CI, pulling from DOKS and App Platform, diagnosing `ImagePullBackOff` and auth errors |
+Browse the available skills in the [`skills/`](skills/) directory. Each skill
+lives in a folder named in `service-job` format (for example `docr-manage`) and
+documents what it does and how to use it in its `SKILL.md`.
 
 ## MCP server
 
