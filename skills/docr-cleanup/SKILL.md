@@ -1,5 +1,5 @@
 ---
-name: digitalocean-container-registry-cleanup
+name: docr-cleanup
 description: >-
   Free up storage in a DigitalOcean Container Registry (DOCR) safely: find
   untagged and stale images, delete tags or manifests, then run garbage
@@ -28,7 +28,7 @@ over pre-training.
 | --- | --- | --- |
 | Cleanup how-to | `https://docs.digitalocean.com/products/container-registry/how-to/clean-up-container-registry/index.html.md` | Authoritative GC behaviour and considerations |
 | Pricing | `https://docs.digitalocean.com/products/container-registry/details/pricing/index.html.md` | Plan quotas, overage billing |
-| Tool reference | `references/tools.md` in the **digitalocean-container-registry** skill, or `retrieve_schema` on the MCP server | Exact arguments for every `docr-*` tool |
+| Tool reference | `references/tools.md` in the **docr-manage** skill, or `retrieve_schema` on the MCP server | Exact arguments for every `docr-*` tool |
 
 Tools are in the `docr` service of the hosted DigitalOcean MCP server; via
 `invoke_tool` use the qualified name `docr/<tool>`.
@@ -148,4 +148,4 @@ mention it and link the cleanup how-to above.
   the list tag leaves the platform manifests untagged; include them in GC.
 - If the plan downgrade is the real goal, usage must be under the target
   plan's quota **after** GC completes, then use `docr-subscription-update`
-  (see digitalocean-container-registry).
+  (see docr-manage).

@@ -22,9 +22,9 @@ Each skill carries its own safety rules for the tools it uses.
 
 | Skill | Useful for |
 | --- | --- |
-| [digitalocean-container-registry](skills/digitalocean-container-registry/SKILL.md) | Create, inspect, and delete Container Registry (DOCR) registries; browse repositories, tags, and manifests; view or change the subscription plan |
-| [digitalocean-container-registry-cleanup](skills/digitalocean-container-registry-cleanup/SKILL.md) | Free registry storage safely: find untagged or stale images, delete tags/manifests, run and monitor garbage collection |
-| [digitalocean-container-registry-access](skills/digitalocean-container-registry-access/SKILL.md) | Docker credentials, pushing from workstations or CI, pulling from DOKS and App Platform, diagnosing `ImagePullBackOff` and auth errors |
+| [docr-manage](skills/docr-manage/SKILL.md) | Create, inspect, and delete Container Registry (DOCR) registries; browse repositories, tags, and manifests; view or change the subscription plan |
+| [docr-cleanup](skills/docr-cleanup/SKILL.md) | Free registry storage safely: find untagged or stale images, delete tags/manifests, run and monitor garbage collection |
+| [docr-access](skills/docr-access/SKILL.md) | Docker credentials, pushing from workstations or CI, pulling from DOKS and App Platform, diagnosing `ImagePullBackOff` and auth errors |
 
 ## MCP server
 
@@ -38,6 +38,11 @@ Your AI client sends requests and the required resource details to
 `mcp.digitalocean.com`, authenticated with your OAuth grant. This toolkit does
 not store your DigitalOcean credentials. See the
 [DigitalOcean Privacy Policy](https://www.digitalocean.com/legal/privacy-policy).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add skills, including the
+`service-job` naming convention and the [skill template](templates/SKILL.md).
 
 ## License
 
