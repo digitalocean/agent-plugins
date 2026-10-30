@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve the DigitalOcean Agent Toolkit. This guide covers how
+Thanks for helping improve DigitalOcean's agent skills. This guide covers how
 to add and update **skills**.
 
 ## Guidelines for adding skills
