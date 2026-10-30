@@ -12,9 +12,6 @@ platforms.
 3. Ask your assistant to manage resources, investigate issues, or answer
    questions about your DigitalOcean environment.
 
-The toolkit reads resources freely, asks for confirmation before making
-changes, and shows the price before creating billable resources.
-
 ## Skills
 
 Skills are loaded automatically when a request matches their description.
