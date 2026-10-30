@@ -1,5 +1,5 @@
 ---
-name: digitalocean-container-registry
+name: docr-manage
 description: >-
   Manage DigitalOcean Container Registry (DOCR) through the DigitalOcean MCP
   server: create or delete registries, check name availability, view and change
@@ -7,8 +7,8 @@ description: >-
   the user mentions DOCR, "container registry", "registry.digitalocean.com",
   "docker registry on DigitalOcean", registry plans/tiers, or wants to see what
   images are stored. For freeing storage or garbage collection use
-  digitalocean-container-registry-cleanup; for push/pull credentials or
-  ImagePullBackOff use digitalocean-container-registry-access.
+  docr-cleanup; for push/pull credentials or
+  ImagePullBackOff use docr-access.
 metadata:
   author: digitalocean
   product: container-registry
@@ -58,7 +58,7 @@ Tier every call before making it. Nothing is run silently.
 | --- | --- | --- |
 | Read | Run freely, no prompt | `docr-list`, `docr-get`, `docr-options`, `docr-validate-name`, `docr-subscription-get`, `docr-repository-list`, `docr-repository-tag-list`, `docr-repository-manifest-list`, `docr-garbage-collection-get`, `docr-garbage-collection-list` |
 | Confirm | Show the change, ask once | `docr-garbage-collection-update` (cancel) |
-| Secret | Avoid; its output enters the conversation and tool logs | `docr-docker-credentials` (rules in digitalocean-container-registry-access) |
+| Secret | Avoid; its output enters the conversation and tool logs | `docr-docker-credentials` (rules in docr-access) |
 | Price first | Show plan name, monthly price, quota, and that billing starts now; then confirm | `docr-create`, `docr-subscription-update` |
 | Destructive | List affected resources by name, state what is lost, require the user to confirm the exact name | `docr-delete`, `docr-repository-tag-delete`, `docr-repository-manifest-delete`, `docr-garbage-collection-start` |
 
@@ -83,8 +83,8 @@ Global rules:
 | Create a registry | [Create a registry](#create-a-registry) below |
 | Delete a registry | [Delete a registry](#delete-a-registry) below |
 | Check or change plan, "upgrade", "over quota on repositories" | [Subscription](#subscription-plan) below |
-| Free storage, delete old tags/images, garbage collection, "registry full" | Load **digitalocean-container-registry-cleanup** |
-| `docker login`, push from CI, pull from DOKS/App Platform, `ImagePullBackOff` | Load **digitalocean-container-registry-access** |
+| Free storage, delete old tags/images, garbage collection, "registry full" | Load **docr-cleanup** |
+| `docker login`, push from CI, pull from DOKS/App Platform, `ImagePullBackOff` | Load **docr-access** |
 | Mirror registries, SOCI images, push-to-deploy | Search the docs index above; no MCP tools cover these |
 
 ## Browse registries and images
@@ -133,7 +133,7 @@ because they are the usual cause of surprising storage usage.
    retry fails with a name conflict; misreading that as "taken by someone
    else" leads to picking a different name and creating a second registry
    the user did not want.
-7. Hand off to **digitalocean-container-registry-access** so the user can log
+7. Hand off to **docr-access** so the user can log
    in and push.
 
 ## Delete a registry
@@ -162,7 +162,7 @@ paying for the plan until `docr-subscription-update` changes it.
   or `OverStorageLimit`. Check this before proposing a change.
 - `docr-subscription-update` (`TierSlug`): price first, confirm, then call.
   If the target tier is not eligible, explain the reason and point the user
-  to **digitalocean-container-registry-cleanup** (storage, repositories) or
+  to **docr-cleanup** (storage, repositories) or
   to deleting registries (`OverRegistryLimit`) before retrying.
 - Storage over the plan quota is billed per GiB per day; untagged images count
   toward usage.

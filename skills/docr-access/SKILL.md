@@ -1,5 +1,5 @@
 ---
-name: digitalocean-container-registry-access
+name: docr-access
 description: >-
   Authenticate to and troubleshoot access for DigitalOcean Container Registry
   (DOCR): obtain Docker credentials, log in with docker or doctl, push images
@@ -170,8 +170,8 @@ Work read-first, in this order:
    (`docr-garbage-collection-list`) and ask whether anyone cleaned up tags.
    Repoint the workload at an existing tag.
 5. **Plan limits?** `docr-subscription-get`. A push rejected with a quota
-   error needs cleanup (digitalocean-container-registry-cleanup) or a plan
-   change (digitalocean-container-registry), not new credentials.
+   error needs cleanup (docr-cleanup) or a plan
+   change (docr-manage), not new credentials.
 
 Do not mint new credentials as a first move; most pull failures are a wrong
 reference, an expired secret, or a deleted tag.
