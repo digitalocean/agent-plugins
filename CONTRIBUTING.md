@@ -59,14 +59,9 @@ description: >-
   <One or two sentences. State what the skill does and the DigitalOcean product
   it covers, then "Use when ..." with the words, errors, and intents that should
   trigger it.>
-metadata:
-  author: digitalocean
-  product: <product-slug>
-  version: "1.0"
 ---
 ```
 
 - `name` must match the folder name and use the `service-job` convention.
 - `description` is what the agent matches against to auto-load the skill — make
   it specific and include trigger phrases.
-- `metadata.product` is the product slug (e.g., `container-registry`).
