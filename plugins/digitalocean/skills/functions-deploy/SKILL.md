@@ -48,9 +48,13 @@ directly.
 `NamespaceID` is the namespace **UUID** from `functions-list-namespaces`,
 not the human label.
 
-The agent does not create access keys for this workflow. The MCP server
+Do not create or delete access keys in this workflow. The MCP server
 authenticates to the data plane itself. `doctl serverless connect` uses the
-user's existing DigitalOcean API token. Keys are **functions-access**.
+user's existing DigitalOcean API token. A `doctl` "namespace not found"
+error is an account mismatch. Follow the deployment guide's account check.
+Do not mint a key to get past it, even if the user asks. Names starting
+with `mcp-do-` belong to the MCP server. Leave them alone. An explicit
+request for a CI key belongs in **functions-manage**.
 
 ## Pick a path
 
@@ -152,7 +156,7 @@ schedule that runs every minute. Current numbers are on the pricing page.
 - Passing the namespace label as `NamespaceID` fails. Use the UUID.
 - A second DigitalOcean account in `doctl` deploys somewhere the MCP list
   does not show. The deployment guide's account check is the fix. Do not
-  debug that by creating access keys.
+  create an access key for "namespace not found", even if the user asks.
 - `context deadline exceeded` on create can mean the client timed out after
   the action was saved. `functions-get-action` before you retry.
 - Remote build time is capped (see limits). A timeout there is a build

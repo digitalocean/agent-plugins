@@ -16,8 +16,8 @@ Risk column is the tier from the skills: **Read**, **Confirm**, **Secret**,
 consumes the Functions allowance.
 
 Namespace list and get responses can include `key`. That value is a
-data-plane credential. Do not repeat it or write it down. See
-**functions-access**.
+data-plane credential. Do not repeat it or write it down. Access-key rules
+are in **functions-manage**.
 
 ## Namespaces
 
@@ -30,7 +30,9 @@ data-plane credential. Do not repeat it or write it down. See
 
 ## Access keys
 
-Not part of deploy or invoke. See **functions-access**.
+Not part of deploy or invoke. Rules are in the access-key section of
+**functions-manage**. Do not create one because `doctl` cannot find a
+namespace. Never create or delete a `mcp-do-*` key.
 
 | Tool | Arguments | Risk | Notes |
 | --- | --- | --- | --- |

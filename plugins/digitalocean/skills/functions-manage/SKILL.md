@@ -4,9 +4,9 @@ description: >-
   List, inspect, and delete DigitalOcean Functions namespaces, packages, and
   actions, and create or change scheduled triggers. Use when the user asks
   what functions they have, to create or delete a namespace, package, or
-  function, or to schedule a function with cron. For deploying code use
-  functions-deploy. For failures and logs use functions-debug. For access
-  keys use functions-access.
+  function, or to schedule a function with cron. Also use when they explicitly
+  ask to create or revoke a namespace access key. For deploying code use
+  functions-deploy. For failures and logs use functions-debug.
 metadata:
   author: digitalocean
   product: functions
@@ -28,7 +28,8 @@ below over pre-training.
 | --- | --- | --- |
 | Tool reference | [references/tools.md](references/tools.md) | Arguments and risk for every marketplace `functions-*` tool |
 | Functions docs index | `https://docs.digitalocean.com/products/functions/llms.txt` | Product questions |
-| Limits | `https://docs.digitalocean.com/products/functions/details/limits/index.html.md` | 10 namespaces, trigger preview caps, log retention |
+| Limits | `https://docs.digitalocean.com/products/functions/details/limits/index.html.md` | 10 namespaces, trigger preview caps, log retention, 200 access keys |
+| Access keys | `https://docs.digitalocean.com/products/functions/how-to/manage-namespace-access/index.html.md` | What a namespace access key is for |
 | Schedule how-to | `https://docs.digitalocean.com/products/functions/how-to/schedule-functions/index.html.md` | Cron fields and `project.yml` triggers |
 | Namespaces how-to | `https://docs.digitalocean.com/products/functions/how-to/create-namespaces/index.html.md` | What a namespace is |
 | Destroy how-to | `https://docs.digitalocean.com/products/functions/how-to/destroy-namespaces/index.html.md` | What deletion removes |
@@ -41,8 +42,8 @@ argument is unclear. `NamespaceID` is the namespace UUID from
 `functions-list-namespaces`, not the label.
 
 Namespace responses can include `key`, a data-plane credential. Never repeat
-`key` in a summary, a file, or a shell command. Listing keys and creating
-them is **functions-access**.
+`key` in a summary, a file, or a shell command. It is not an access key the
+user can copy into CI. Access-key rules are below.
 
 ## Safety rules
 
@@ -74,7 +75,7 @@ Global rules:
 | Run on a schedule, cron, enable or disable a trigger | [Schedule](#schedule) |
 | Deploy or change code | Load **functions-deploy** |
 | It failed, show logs | Load **functions-debug** |
-| Access key for CI or `doctl` | Load **functions-access**. `doctl serverless connect` does not need a new key |
+| Access key for CI, or revoke one | [Access keys](#access-keys). `doctl serverless connect` does not need a new key |
 
 ## Browse
 
@@ -110,7 +111,7 @@ concurrent activations and 600 invocations per minute (see limits).
    Show counts and names. `functions-delete-namespace` removes the
    namespace and every function, package, and trigger in it. Require the
    user to confirm the exact label or UUID. Do not follow a namespace
-   delete by deleting `mcp-do-*` keys. See **functions-access**.
+   delete by deleting `mcp-do-*` keys.
 
 ## Schedule
 
@@ -141,6 +142,36 @@ deployed with `doctl`. The durable option is a `triggers` entry in
 
 There is no trigger type other than `SCHEDULED`.
 
+## Access keys
+
+An access key is a data-plane credential. Deploy, invoke, and
+`doctl serverless connect` do not need one. The server keeps its own keys.
+`doctl` uses the user's API token.
+
+Do not create a key because `doctl` says the namespace was not found, even
+if the user also asks for a key. That error is an account mismatch. Load
+**functions-deploy** and follow the deployment guide's account check.
+
+| Tier | Behaviour | Tools |
+| --- | --- | --- |
+| Read | Run freely. Metadata only. No secrets | `functions-list-access-keys` |
+| Secret | Only after an explicit request, and only after the warning below | `functions-create-access-key` |
+| Destructive | Confirm the exact key id and name. Never for `mcp-do-*` | `functions-delete-access-key` |
+
+- Never create or delete a key whose name starts with `mcp-do-`. The server
+  owns that prefix. Deleting one makes it create another, and revoked keys
+  still count toward the team limit of 200.
+- A created secret is shown once. It enters this session and the tool log.
+  Say that before calling `functions-create-access-key`. Do not write it to
+  a file, a repo, or a Dockerfile. The user copies it into their own store.
+- Set `ExpiresIn` (`24h` or `7d`, minimum `1h`) unless the user explicitly
+  asks for a key that does not expire. Creating one needs `function:admin`.
+  A 403 is a missing scope. Do not retry under another name.
+- List keys first. Show name, id, and expiry. Confirm the name and expiry,
+  then create. To revoke, match the name to one id, refuse `mcp-do-*`, and
+  delete only after the user confirms that id.
+- In unattended runs, do not create or delete keys.
+
 ## Pitfalls
 
 - Label versus UUID. Deletes and lists take `NamespaceID` (UUID).
@@ -150,3 +181,5 @@ There is no trigger type other than `SCHEDULED`.
   See the warning in the schedule how-to.
 - `functions-list-activations` is for **functions-debug**. Sync web calls
   often leave no activation record.
+- A `mcp-do-*` key is not leaked. Do not delete it.
+- Omitting `ExpiresIn` creates a key that does not expire.
