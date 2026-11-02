@@ -97,8 +97,9 @@ Credential rules:
 
 ## Pitfalls
 
-- Minting a key because `doctl` reported "namespace not found". That is
-  usually an account mismatch. **functions-deploy** and the deployment
-  guide handle it.
+- Minting a key because `doctl` reported "namespace not found", even
+  when the user also asks for a key. That error is an account mismatch.
+  Do not create a key. Load **functions-deploy** and follow the deployment
+  guide's account check.
 - Treating a listed `mcp-do-*` key as leaked and deleting it.
 - Omitting `ExpiresIn`, which creates a key that does not expire.

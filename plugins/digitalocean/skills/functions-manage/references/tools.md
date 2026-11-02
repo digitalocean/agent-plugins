@@ -70,6 +70,15 @@ not available for App Platform function components).
 | `functions-update-trigger` | `NamespaceID` (req), `TriggerName` (req), `IsEnabled`, `Cron`, `Body` | Confirm | Does not rename. |
 | `functions-delete-trigger` | `NamespaceID` (req), `TriggerName` (req) | Destructive | A later `doctl serverless deploy` can also drop a trigger that is absent from `project.yml`. |
 
+## Activations
+
+| Tool | Arguments | Risk | Notes |
+| --- | --- | --- | --- |
+| `functions-list-activations` | `NamespaceID` (req), `FunctionName`, `Limit` (0–200, default 30), `Skip`, `Since`, `Upto`, `IncludeDocs` | Read | `Since` and `Upto` are milliseconds since epoch. `IncludeDocs` adds full records to the list. Records are kept for asynchronous invocations, for 72 hours. |
+| `functions-get-activation` | `NamespaceID` (req), `ActivationID` (req) | Read | Full record: response, logs, timing, status. |
+| `functions-get-activation-logs` | `NamespaceID` (req), `ActivationID` (req) | Read | Logs only. |
+| `functions-get-activation-result` | `NamespaceID` (req), `ActivationID` (req) | Read | Result and status only. |
+
 ## Deployment guide
 
 | Tool | Arguments | Risk | Notes |

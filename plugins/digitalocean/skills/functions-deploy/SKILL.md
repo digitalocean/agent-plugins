@@ -74,7 +74,7 @@ dependencies.
 | --- | --- | --- |
 | Read | Run freely | `functions-list-namespaces`, `functions-get-namespace`, `functions-list-actions`, `functions-get-action`, `functions-deployment-guide` |
 | Confirm | Show namespace label, region, action name, and runtime. Say that an existing action is replaced. Then call | `functions-create-namespace`, `functions-create-or-update-action` |
-| Run code | One invoke, with a payload the user supplied or an empty object. Do not loop | `functions-invoke-action` |
+| Run code | Only if the user asked to test. One invoke, with their payload. Do not invent a payload, and do not loop | `functions-invoke-action` |
 
 Global rules:
 
@@ -119,9 +119,10 @@ Global rules:
    `blackbox` needs `Image`, not `Code`.
 5. This path does not turn on a public web URL. For `web: true`, use the
    project path. Do not invent web annotations.
-6. Verify with one `functions-invoke-action` (`Blocking` default true).
-   Then show the result. On failure, load **functions-debug**. Do not
-   redeploy in a loop.
+6. If the user asked to test, one `functions-invoke-action` (`Blocking`
+   default true) with their payload. Then show the result. On failure, load
+   **functions-debug**. Do not redeploy in a loop. A deploy request alone
+   is not a request to invoke.
 
 ## Project deploy
 
