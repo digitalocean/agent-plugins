@@ -6,19 +6,33 @@ platforms.
 
 ## Use it
 
-1. Install or add this toolkit using your AI client's plugin instructions.
+1. Install or add this toolkit using your AI client's plugin instructions. It
+   works with any client that supports the open [Agent Plugins](https://agent-plugins.org)
+   standard, including Claude Code and Cursor.
 2. Connect to the hosted DigitalOcean MCP server and sign in to your
    DigitalOcean account through OAuth.
 3. Ask your assistant to manage resources, investigate issues, or answer
    questions about your DigitalOcean environment.
+
+## Plugins
+
+Plugins live under [`plugins/`](plugins/), each in its own folder with its
+manifests, MCP config, and skills. The repository is indexed for both
+toolchains:
+
+| Toolchain | Index |
+| --- | --- |
+| Claude Code | [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) |
+| Cursor | [`.cursor-plugin/marketplace.json`](.cursor-plugin/marketplace.json) |
 
 ## Skills
 
 Skills are loaded automatically when a request matches their description.
 Each skill carries its own safety rules for the tools it uses.
 
-Browse the available skills in the [`skills/`](skills/) directory. Each skill
-lives in a folder named in `service-job` format (for example `docr-manage`) and
+Browse the available skills in
+[`plugins/digitalocean/skills/`](plugins/digitalocean/skills/). Each skill lives
+in a folder named in `service-job` format (for example `docr-manage`) and
 documents what it does and how to use it in its `SKILL.md`.
 
 ## MCP server

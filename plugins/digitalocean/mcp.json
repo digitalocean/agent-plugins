@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "digitalocean": {
+      "type": "streamable-http",
+      "url": "https://mcp.digitalocean.com/mcp"
+    }
+  }
+}

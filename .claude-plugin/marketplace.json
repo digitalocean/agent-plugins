@@ -1,0 +1,14 @@
+{
+  "name": "digitalocean",
+  "owner": {
+    "name": "DigitalOcean",
+    "url": "https://www.digitalocean.com"
+  },
+  "plugins": [
+    {
+      "name": "digitalocean",
+      "source": "./plugins/digitalocean",
+      "description": "Build, deploy, manage, and troubleshoot applications and infrastructure across DigitalOcean's cloud platform."
+    }
+  ]
+}

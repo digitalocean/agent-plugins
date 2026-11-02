@@ -49,8 +49,8 @@ When contributing new skills to this repository, follow these guidelines:
 ## Skill template
 
 Start from [`templates/SKILL.md`](templates/SKILL.md): copy it into a new
-`skills/<service>-<job>/` folder and fill it in. Every `SKILL.md` begins with
-YAML frontmatter in this format:
+`plugins/<plugin>/skills/<service>-<job>/` folder and fill it in. Every
+`SKILL.md` begins with YAML frontmatter in this format:
 
 ```yaml
 ---
