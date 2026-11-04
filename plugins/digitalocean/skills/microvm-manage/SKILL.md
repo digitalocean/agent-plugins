@@ -247,14 +247,20 @@ restriction is on the checkpoint delete, not on deleting the MicroVM.
 Applies to `microvm-delete`, `microvm-checkpoint-delete`, and the matching
 `doctl compute microvm` delete commands.
 
-1. `microvm-get` (or checkpoint get) and show the id and name.
+1. For a MicroVM, `microvm-get` and show the id and name. For a checkpoint,
+   `microvm-checkpoint-get` and show the checkpoint id and name.
 2. Before a MicroVM delete, offer pause or a checkpoint if the user may want
    the data.
 3. Say the delete cannot be undone. The user confirms the exact id after
    seeing it. An earlier "yes" or "delete it" is not that confirmation.
 4. Do not pass doctl `--force` until that id was confirmed. doctl delete
    accepts several ids and skips its own prompt with `--force`.
-5. Verify with `microvm-list` or `microvm-get`.
+5. After a MicroVM delete, verify with `microvm-list` or `microvm-get`
+   (`doctl compute microvm list` or `get`). After a checkpoint delete,
+   verify with `microvm-checkpoint-list` or `microvm-checkpoint-get`
+   (`doctl compute microvm checkpoint list` or `checkpoint get`). Only that
+   checkpoint lookup shows the checkpoint is gone. Checkpoint storage keeps
+   billing until it does.
 
 ## doctl fallback
 
@@ -303,3 +309,4 @@ into a command, this skill, or the chat.
 - Treating `doctl account get` as the team behind the MCP connection.
 - Polling `microvm-get` until `running` after a pause. `paused` is finished.
 - Using `doctl compute microvm download` to write a file into the guest.
+- Treating a MicroVM not-found as proof a checkpoint was deleted.

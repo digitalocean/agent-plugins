@@ -65,12 +65,12 @@ A write that does not fit `microvm-file-write` is `doctl compute microvm upload`
 
 ## Checkpoints
 
-| Tool                        | Arguments                        | Risk        | Notes                                                                                                                                                            |
-| --------------------------- | -------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `microvm-checkpoint-list`   | `microvm_id`, `page`, `per_page` | Read        | `microvm_id` is optional.                                                                                                                                        |
-| `microvm-checkpoint-get`    | `id` (req, checkpoint UUID)      | Read        | Poll until `CHECKPOINT_AVAILABLE` or `CHECKPOINT_FAILED`.                                                                                                        |
-| `microvm-checkpoint-create` | `id` (req, MicroVM UUID), `name` | Confirm     | Async. Stores memory and disk, which can include guest secrets. Storage stays billable until this checkpoint is deleted, including after the MicroVM is deleted. |
-| `microvm-checkpoint-delete` | `id` (req, checkpoint UUID)      | Destructive | 400 while capture is still in progress. That restriction does not apply to `microvm-delete`.                                                                     |
+| Tool                        | Arguments                        | Risk        | Notes                                                                                                                                                                                                                                                                       |
+| --------------------------- | -------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `microvm-checkpoint-list`   | `microvm_id`, `page`, `per_page` | Read        | `microvm_id` is optional.                                                                                                                                                                                                                                                   |
+| `microvm-checkpoint-get`    | `id` (req, checkpoint UUID)      | Read        | Poll until `CHECKPOINT_AVAILABLE` or `CHECKPOINT_FAILED`.                                                                                                                                                                                                                   |
+| `microvm-checkpoint-create` | `id` (req, MicroVM UUID), `name` | Confirm     | Async. Stores memory and disk, which can include guest secrets. Storage stays billable until this checkpoint is deleted, including after the MicroVM is deleted.                                                                                                            |
+| `microvm-checkpoint-delete` | `id` (req, checkpoint UUID)      | Destructive | 400 while capture is still in progress. That restriction does not apply to `microvm-delete`. Verify with `microvm-checkpoint-get` or `microvm-checkpoint-list`. A `microvm-get` not-found does not show the checkpoint is gone, and its storage stays billable until it is. |
 
 ## Not on these tools
 
