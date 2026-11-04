@@ -180,10 +180,12 @@ message and stop before changing anything.
    or `NoExecute`). The advertised schema says strings, but strings are
    dropped without an error. A taint can stop existing pods from scheduling, so
    confirm the effect with the user.
+   Leave `Taints` out when you are not changing them. The tool sends
+   `"taints": null` in that case and the API treats it as no change. Removing
+   every taint may not work through this tool, because an empty list can also
+   be sent as `null`. If the user needs that, say so instead of retrying.
 5. Verify. `doks-get-nodepool` and compare count, autoscale range, labels, and
-   taints with what the user confirmed. The update handler always includes the
-   `taints` field, so check that existing taints survived an unrelated update
-   and re-apply them if they did not.
+   taints with what the user confirmed.
 
 ## Change cluster settings
 
