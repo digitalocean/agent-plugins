@@ -24,7 +24,7 @@ Risk column is the tier from **microvm-manage**: **Read**, **Confirm**,
 | Tool             | Arguments                                                                                                                                                                             | Risk        | Notes                                                                                                                                                                                                                                                                                                                                                                                   |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `microvm-list`   | `name`, `region`, `tag_name`, `page` (default 1), `per_page` (default 25, max 200)                                                                                                    | Read        | Paginated.                                                                                                                                                                                                                                                                                                                                                                              |
-| `microvm-get`    | `id` (req)                                                                                                                                                                            | Read        | Poll until `state` is `running` or `failed`. On `failed`, report `failure_reason`.                                                                                                                                                                                                                                                                                                      |
+| `microvm-get`    | `id` (req)                                                                                                                                                                            | Read        | After `microvm-create`, poll until `state` is `running` or `failed`, and on `failed` report `failure_reason`. Any other get is one read. `paused` and `running` are finished states.                                                                                                                                                                                                    |
 | `microvm-create` | `name` (req), `source` (req), `region` and `size` with `oci_ref`, `networking`, `vpc_uuid`, `http_port`, `ports`, `http_protocol`, `auto_pause`, `auto_resume`, `environment`, `tags` | Price       | `source` is exactly one of `oci_ref` or `checkpoint_id`. Restore inherits region and size. `name` is unique in the region. `networking` is `public` (default) or `vpc`. `http_port` defaults to `8080`. `ports` max 5 and includes `http_port`. `auto_pause` is `{ "idle_timeout" }` only; `enabled: false` is rejected. `auto_resume` defaults to true. No egress-allow-list argument. |
 | `microvm-pause`  | `id` (req)                                                                                                                                                                            | Confirm     | Sync and idempotent. Compute billing stops. Disk storage continues.                                                                                                                                                                                                                                                                                                                     |
 | `microvm-resume` | `id` (req)                                                                                                                                                                            | Confirm     | Sync and idempotent. Compute billing starts again.                                                                                                                                                                                                                                                                                                                                      |
@@ -58,8 +58,10 @@ restarts compute billing. Say so and get a yes first.
 | `microvm-file-read`  | `id` (req), `path` (req), `encoding` (`utf-8` default, or `base64`)                          | Run  | Absolute path. Max 4 MiB. Non-UTF-8 bytes come back as base64. Check `encoding` before treating `content` as text. Response: `path`, `size_bytes`, `sha256`, `encoding`, `content`.                                                      |
 | `microvm-file-write` | `id` (req), `path` (req), `content` (req), `encoding`, `mode` (default `0644`), `uid`, `gid` | Run  | Replaces the target. Parent directory must exist. `uid` and `gid` are set together. SHA-256 is sent with the body; a mismatch returns 422 and leaves the file untouched. Response: `path`, `size_bytes`, `sha256`, `mode`, `uid`, `gid`. |
 
-Above 4 MiB, use `doctl compute microvm download` (stream, up to 64 MiB).
-Check its `--help`.
+A read above 4 MiB is `doctl compute microvm download` (stream, up to 64 MiB).
+A write that does not fit `microvm-file-write` is `doctl compute microvm upload`
+(up to 64 MiB). Download cannot place a file on the guest. Read the subcommand
+`--help` before calling either one. Do not pass `--access-token` or `--show`.
 
 ## Checkpoints
 
@@ -74,8 +76,10 @@ Check its `--help`.
 
 The published doctl reference does not list an egress allow list. If
 `doctl compute microvm create --help` prints those flags, use only the flags
-it prints and confirm every destination and port first. File transfer above
-4 MiB is `doctl compute microvm download`; read its `--help` before calling
-it.
+it prints and confirm every destination and port first. A read above 4 MiB
+is `doctl compute microvm download`. A write that does not fit
+`microvm-file-write` is `doctl compute microvm upload` (up to 64 MiB). Read
+that subcommand's `--help` before calling it. Download cannot place a file
+on the guest.
 
 Never paste `DIGITALOCEAN_ACCESS_TOKEN` into a command or the chat.
