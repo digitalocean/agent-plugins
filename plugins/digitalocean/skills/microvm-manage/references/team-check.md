@@ -12,4 +12,4 @@ Before an MCP create, pause, resume, exec, file call, checkpoint, or delete:
 
 Never create or paste a token to identify the team.
 
-When MCP is not connected and doctl makes the call, `doctl account get` is the billed team.
+When doctl makes the call, `doctl account get` is the billed team. Show it and confirm it first. This includes an allow-list create and a file upload or download while MCP is connected. A shared MicroVM id does not cover a create, because the MicroVM does not exist yet.
