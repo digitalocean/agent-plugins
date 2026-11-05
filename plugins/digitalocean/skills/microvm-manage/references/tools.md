@@ -17,8 +17,8 @@ Source of truth: `pkg/registry/microdroplet/README.md` in [digitalocean-labs/mcp
 
 `microvm-create`:
 
-- `name`: unique in the region. 1–63 lowercase letters, digits, and hyphens.
-- `source`: `{ "oci_ref": "…" }` or `{ "checkpoint_id": "…" }`.
+- `name`: unique in the region. 1-63 lowercase letters, digits, and hyphens.
+- `source`: `{ "oci_ref": "..." }` or `{ "checkpoint_id": "..." }`.
 - `size`: `{ "cpu": 1, "memory": 2048 }`, memory in MiB. Valid pairs are on the limits page.
 - `networking`: `public` (default) or `vpc`. `vpc_uuid` is required with `vpc`.
 - `http_port`: default `8080`. `ports`: at most 5, including `http_port`. `http_protocol`: `http` or `http2`.

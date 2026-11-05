@@ -11,5 +11,6 @@
 | Run commands | `https://docs.digitalocean.com/products/microvms/how-to/run-commands/index.html.md` | Commands longer than the exec timeout, `sh -c` |
 | Lifecycle | `https://docs.digitalocean.com/products/microvms/concepts/lifecycle/index.html.md` | States, auto-pause, auto-resume, billing by state |
 | Networking | `https://docs.digitalocean.com/products/microvms/concepts/networking-access/index.html.md` | Endpoint, ports, public versus VPC, token scopes |
+| Troubleshooting | `https://docs.digitalocean.com/products/microvms/reference/troubleshooting/index.html.md` | Failed MicroVMs, paused requests, HTTP 403 on create |
 
 For doctl subcommands and flags, read `doctl compute microvm <command> --help` on the installed version.

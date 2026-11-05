@@ -13,3 +13,5 @@ Before an MCP create, pause, resume, exec, file call, checkpoint, or delete:
 Never create or paste a token to identify the team.
 
 When doctl makes the call, `doctl account get` is the billed team. Show it and confirm it first. This includes an allow-list create and a file upload or download while MCP is connected. A shared MicroVM id does not cover a create, because the MicroVM does not exist yet.
+
+After a delete, verify with the same client that deleted. `microvm-delete` with `microvm-get` or `microvm-list`. `doctl compute microvm delete` with `doctl compute microvm get` or `list`. `microvm-checkpoint-delete` with `microvm-checkpoint-get` or `microvm-checkpoint-list`. `doctl compute microvm checkpoint delete` with `doctl compute microvm checkpoint get` or `list`. A not-found from the other client is unconfirmed, because it may be another team.
