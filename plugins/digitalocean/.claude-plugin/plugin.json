@@ -8,6 +8,7 @@
     "url": "https://www.digitalocean.com"
   },
   "homepage": "https://www.digitalocean.com",
+  "icon": "./logo.png",
   "privacyPolicyUrl": "https://www.digitalocean.com/legal/privacy-policy",
   "repository": "https://github.com/digitalocean/agent-plugins",
   "license": "MIT",
