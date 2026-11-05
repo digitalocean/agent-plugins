@@ -9,7 +9,7 @@ description: >-
 metadata:
   author: digitalocean
   product: container-registry
-  version: "1.0"
+  version: "1.1"
 ---
 
 # DOCR storage cleanup and garbage collection
@@ -30,8 +30,10 @@ over pre-training.
 | Pricing | `https://docs.digitalocean.com/products/container-registry/details/pricing/index.html.md` | Plan quotas, overage billing |
 | Tool reference | `references/tools.md` in the **docr-manage** skill, or `retrieve_schema` on the MCP server | Exact arguments for every `docr-*` tool |
 
-Tools are in the `docr` service of the hosted DigitalOcean MCP server; via
-`invoke_tool` use the qualified name `docr/<tool>`.
+Tools are in the `docr` service of the hosted DigitalOcean MCP server. When
+the client exposes only `find_tools` / `retrieve_schema` / `invoke_tool`, call
+`invoke_tool` with the qualified name `docr/<tool>` and use `retrieve_schema`
+whenever an argument is unclear.
 
 ## Safety rules
 
@@ -104,6 +106,11 @@ Prefer **manifest deletes** over tag deletes for cleanup:
 Delete one item per call, from the confirmed list only. Stop on the first
 error and report it; do not retry with different arguments.
 
+Verify before moving on: re-run `docr-repository-manifest-list` (or
+`docr-repository-tag-list`) for each touched repository and confirm the
+deleted digests or tags are gone. Storage usage will not have changed yet;
+that is expected.
+
 ### 4. Garbage collect
 
 1. Confirm timing: the registry is read-only while GC runs, and DOCR may wait
@@ -149,3 +156,27 @@ mention it and link the cleanup how-to above.
 - If the plan downgrade is the real goal, usage must be under the target
   plan's quota **after** GC completes, then use `docr-subscription-update`
   (see docr-manage).
+
+## If MCP is not connected
+
+Use `doctl` (authenticate once with `doctl auth init`). The user runs these
+themselves; do not ask for their API token. The same rules apply: show the
+list of what will be deleted and get a yes before any delete, and warn that
+garbage collection makes the registry read-only.
+
+```shell
+doctl registries get <registry>
+doctl registries repository list-v2 <registry>
+doctl registries repository list-manifests <registry> <repository>
+doctl registries repository list-tags <registry> <repository>
+doctl registries repository delete-manifest <registry> <repository> <digest>   # prompts
+doctl registries repository delete-tag <registry> <repository> <tag>           # prompts
+doctl registries garbage-collection get-active <registry>
+doctl registries garbage-collection start <registry> --include-untagged-manifests   # prompts
+doctl registries garbage-collection list <registry>
+doctl registries garbage-collection cancel <registry> <gc-uuid>
+```
+
+`--include-untagged-manifests` is the equivalent of the
+`untagged manifests and unreferenced blobs` type above. Do not add `--force`;
+the confirmation prompt is the user's last check.

@@ -41,10 +41,10 @@ Preferred paths keep the secret out of the agent session entirely. The
 
 | Consumer | Preferred (user runs it) | If minted via MCP |
 | --- | --- | --- |
-| Local `docker` | `doctl registries login` | User merges the output into `~/.docker/config.json` themselves (do not overwrite other registries' `auths`). |
-| GitHub Actions | `DIGITALOCEAN_ACCESS_TOKEN` secret + `digitalocean/action-doctl` + `doctl registries login --expiry-seconds 1200` in the job | User pastes the output into a repository secret; the job writes it to `$HOME/.docker/config.json`. Agent does not write it anywhere. |
+| Local `docker` | `doctl registries login <registry>` | User merges the output into `~/.docker/config.json` themselves (do not overwrite other registries' `auths`). |
+| GitHub Actions | `DIGITALOCEAN_ACCESS_TOKEN` secret + `digitalocean/action-doctl` + `doctl registries login <registry> --expiry-seconds 1200` in the job | User pastes the output into a repository secret; the job writes it to `$HOME/.docker/config.json`. Agent does not write it anywhere. |
 | Other CI | Same token + `doctl` pattern | User stores it in the provider's secret store; mask it in logs. |
-| Kubernetes (manual) | `doctl registries kubernetes-manifest \| kubectl apply -f -` (creates `registry-<registry>`) | User runs `kubectl create secret generic <name> --from-file=.dockerconfigjson=<file> --type=kubernetes.io/dockerconfigjson`, then sets `imagePullSecrets`. |
+| Kubernetes (manual) | `doctl registries kubernetes-manifest <registry> \| kubectl apply -f -` (creates `registry-<registry>`) | User runs `kubectl create secret generic <name> --from-file=.dockerconfigjson=<file> --type=kubernetes.io/dockerconfigjson`, then sets `imagePullSecrets`. |
 | Kubernetes (DOKS integration) | Control panel → registry Settings → DigitalOcean Kubernetes integration | Not applicable. |
 | App Platform | `image.registry_type: DOCR` in the app spec | Not applicable. |
 
