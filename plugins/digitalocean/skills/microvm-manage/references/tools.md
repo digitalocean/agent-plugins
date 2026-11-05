@@ -4,20 +4,13 @@ Source of truth: `pkg/registry/microdroplet/README.md` in
 [digitalocean-labs/mcp-digitalocean](https://github.com/digitalocean-labs/mcp-digitalocean).
 The published page is
 `https://docs.digitalocean.com/reference/mcp/microvms-mcp-tools/index.html.md`.
-If this table and live `retrieve_schema` output differ, trust the live
-schema.
+If this table and live `retrieve_schema` output differ, trust the live schema.
 
-Tools are in the `microvms` service. Through the hosted DigitalOcean MCP
-server invoke them as `microvms/<tool>`. On
-`https://microvms.mcp.digitalocean.com/mcp` they are exposed as `microvm-*`.
-Hosted agents may see `digitalocean_microvm-*`.
+Tools are in the `microvms` service. Through the hosted DigitalOcean MCP server invoke them as `microvms/<tool>`. On `https://microvms.mcp.digitalocean.com/mcp` they are exposed as `microvm-*`. Hosted agents may see `digitalocean_microvm-*`.
 
-`id` on lifecycle, exec, and file tools is the MicroVM UUID. `id` on
-`microvm-checkpoint-get` and `microvm-checkpoint-delete` is the checkpoint
-UUID.
+`id` on lifecycle, exec, and file tools is the MicroVM UUID. `id` on `microvm-checkpoint-get` and `microvm-checkpoint-delete` is the checkpoint UUID.
 
-Risk column is the tier from **microvm-manage**: **Read**, **Confirm**,
-**Price**, **Run**, **Destructive**.
+Risk column is the tier from **microvm-manage**: **Read**, **Confirm**, **Price**, **Run**, **Destructive**.
 
 ## Lifecycle
 
@@ -30,19 +23,13 @@ Risk column is the tier from **microvm-manage**: **Read**, **Confirm**,
 | `microvm-resume` | `id` (req)                                                                                                                                                                            | Confirm     | Sync and idempotent. Compute billing starts again.                                                                                                                                                                                                                                                                                                                                      |
 | `microvm-delete` | `id` (req)                                                                                                                                                                            | Destructive | Irreversible. Confirm the exact id first.                                                                                                                                                                                                                                                                                                                                               |
 
-`size` is `{ "cpu": 1, "memory": 2048 }` with memory in MiB. Valid pairs are
-on the limits page, not in this file. `environment` is boot-time key/value
-and is not returned by the API. Do not put secrets in it unless the user
-supplied them for that create.
+`size` is `{ "cpu": 1, "memory": 2048 }` with memory in MiB. Valid pairs are on the limits page, not in this file. `environment` is boot-time key/value and is not returned by the API. Do not put secrets in it unless the user supplied them for that create.
 
-There is no resize tool. Console WebSocket and the Images API are not MCP
-tools.
+There is no resize tool. Console WebSocket and the Images API are not MCP tools.
 
 ## Exec
 
-Needs the team feature `exec_pty`. One-shot, non-interactive, no stdin. About
-50 seconds. HTTP 200 with a non-zero `exit_code` is still a successful tool
-call.
+Needs the team feature `exec_pty`. One-shot, non-interactive, no stdin. About 50 seconds. HTTP 200 with a non-zero `exit_code` is still a successful tool call.
 
 | Tool           | Arguments                                                                                    | Risk | Notes                                                                                                                                                                                                                                                               |
 | -------------- | -------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -50,18 +37,14 @@ call.
 
 ## Files
 
-Needs the team feature `file_transfer`. A paused MicroVM is resumed, which
-restarts compute billing. Say so and get a yes first.
+Needs the team feature `file_transfer`. A paused MicroVM is resumed, which restarts compute billing. Say so and get a yes first.
 
 | Tool                 | Arguments                                                                                    | Risk | Notes                                                                                                                                                                                                                                    |
 | -------------------- | -------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `microvm-file-read`  | `id` (req), `path` (req), `encoding` (`utf-8` default, or `base64`)                          | Run  | Absolute path. Max 4 MiB. Non-UTF-8 bytes come back as base64. Check `encoding` before treating `content` as text. Response: `path`, `size_bytes`, `sha256`, `encoding`, `content`.                                                      |
 | `microvm-file-write` | `id` (req), `path` (req), `content` (req), `encoding`, `mode` (default `0644`), `uid`, `gid` | Run  | Replaces the target. Parent directory must exist. `uid` and `gid` are set together. SHA-256 is sent with the body; a mismatch returns 422 and leaves the file untouched. Response: `path`, `size_bytes`, `sha256`, `mode`, `uid`, `gid`. |
 
-A read above 4 MiB is `doctl compute microvm download` (stream, up to 64 MiB).
-A write that does not fit `microvm-file-write` is `doctl compute microvm upload`
-(up to 64 MiB). Download cannot place a file on the guest. Read the subcommand
-`--help` before calling either one. Do not pass `--access-token` or `--show`.
+A read above 4 MiB is `doctl compute microvm download` (stream, up to 64 MiB). A write that does not fit `microvm-file-write` is `doctl compute microvm upload` (up to 64 MiB). Download cannot place a file on the guest. Read the subcommand `--help` before calling either one. Do not pass `--access-token` or `--show`.
 
 ## Checkpoints
 
@@ -74,12 +57,6 @@ A write that does not fit `microvm-file-write` is `doctl compute microvm upload`
 
 ## Not on these tools
 
-The published doctl reference does not list an egress allow list. If
-`doctl compute microvm create --help` prints those flags, use only the flags
-it prints and confirm every destination and port first. A read above 4 MiB
-is `doctl compute microvm download`. A write that does not fit
-`microvm-file-write` is `doctl compute microvm upload` (up to 64 MiB). Read
-that subcommand's `--help` before calling it. Download cannot place a file
-on the guest.
+`microvm-create` has no egress allow list. If `doctl compute microvm create --help` prints those flags, use only the flags it prints and confirm every destination and port first. Reads above 4 MiB and writes that do not fit the inline tool follow the file commands above.
 
 Never paste `DIGITALOCEAN_ACCESS_TOKEN` into a command or the chat.
