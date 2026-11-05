@@ -14,6 +14,42 @@ platforms.
 3. Ask your assistant to manage resources, investigate issues, or answer
    questions about your DigitalOcean environment.
 
+## Install from this marketplace
+
+### Claude Code
+
+Add this repository as a marketplace and install the plugin:
+
+```shell
+/plugin marketplace add digitalocean/agent-plugins
+/plugin install digitalocean@digitalocean
+```
+
+Then run `/mcp` and sign in to your DigitalOcean account when prompted.
+
+### Cursor
+
+To add this repository as a personal marketplace:
+
+1. In the Cursor app, open the Command Palette (`Cmd+Shift+P` on macOS,
+   `Ctrl+Shift+P` on Windows and Linux) and run **Open Customize**.
+2. Go to **Plugins** and click **Browse Marketplace**.
+3. Click **Add Marketplace**, then **Import from GitHub**.
+4. Paste `https://github.com/digitalocean/agent-plugins`, leave the scope on
+   **User**, and import.
+
+On a Teams or Enterprise plan, an admin can instead import this repository as a team marketplace:
+
+1. Go to **Dashboard > Plugins & MCPs**.
+2. In **Team Marketplaces**, click **Add Marketplace**.
+3. Use **Import from Repo** and paste
+   `https://github.com/digitalocean/agent-plugins`.
+4. Add and review plugins using **Add to Marketplace**.
+5. Under **Marketplace Settings**, set **Marketplace Access**, optionally
+   enable **Auto Refresh**, then save.
+
+Teammates then find and install it from **Customize** in the Cursor sidebar.
+
 ## Plugins
 
 Plugins live under [`plugins/`](plugins/), each in its own folder with its
@@ -41,13 +77,6 @@ documents what it does and how to use it in its `SKILL.md`.
 | ------------ | ---------------------------------- |
 | digitalocean | `https://mcp.digitalocean.com/mcp` |
 
-## Data
-
-Your AI client sends requests and the required resource details to
-`mcp.digitalocean.com`, authenticated with your OAuth grant. This toolkit does
-not store your DigitalOcean credentials. See the
-[DigitalOcean Privacy Policy](https://www.digitalocean.com/legal/privacy-policy).
-
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add skills, including the
@@ -55,4 +84,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add skills, including the
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Licensed under the MIT License, see [LICENSE](LICENSE) for details.
