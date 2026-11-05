@@ -1,5 +1,6 @@
 {
   "name": "digitalocean",
+  "description": "DigitalOcean agent plugins for Claude Code.",
   "owner": {
     "name": "DigitalOcean",
     "url": "https://www.digitalocean.com"
