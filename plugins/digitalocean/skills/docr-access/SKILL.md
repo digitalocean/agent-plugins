@@ -10,7 +10,7 @@ description: >-
 metadata:
   author: digitalocean
   product: container-registry
-  version: "1.0"
+  version: "1.1"
 ---
 
 # DOCR access: credentials, push, pull
@@ -32,8 +32,10 @@ over pre-training.
 | App Platform how-to | `https://docs.digitalocean.com/products/app-platform/how-to/deploy-from-container-images/index.html.md` | Deploying DOCR images on App Platform |
 | Credential patterns | [references/credentials.md](references/credentials.md) | Shapes of the credential output and where each goes |
 
-Tools are in the `docr` service of the hosted DigitalOcean MCP server; via
-`invoke_tool` use the qualified name `docr/<tool>`.
+Tools are in the `docr` service of the hosted DigitalOcean MCP server. When
+the client exposes only `find_tools` / `retrieve_schema` / `invoke_tool`, call
+`invoke_tool` with the qualified name `docr/<tool>` and use `retrieve_schema`
+whenever an argument is unclear.
 
 ## Safety rules
 
@@ -49,13 +51,13 @@ Credential rules:
   file or secret store through a tool call records it there too. "Not
   printing it" does not make it secret. So the default answer to "give me
   credentials" is to hand the user a command they run themselves:
-  - Workstation: `doctl registries login` (or `docker login` with their
-    own API token).
+  - Workstation: `doctl registries login <registry>` (or `docker login`
+    with their own API token).
   - CI: store a `DIGITALOCEAN_ACCESS_TOKEN` secret and run
-    `doctl registries login --expiry-seconds 1200` in the job.
+    `doctl registries login <registry> --expiry-seconds 1200` in the job.
   - Kubernetes: control-panel DOKS integration, or
-    `doctl registries kubernetes-manifest | kubectl apply -f -` run by the
-    user.
+    `doctl registries kubernetes-manifest <registry> | kubectl apply -f -`
+    run by the user.
   - Any client: **Download Docker Credentials** in the registry's control
     panel page.
 - Mint via MCP only when the user explicitly asks after hearing the above,
@@ -86,7 +88,7 @@ Credential rules:
 Preferred: the user has `doctl` installed and authenticated.
 
 ```shell
-doctl registries login           # older doctl: doctl registry login
+doctl registries login <registry>      # older doctl: doctl registry login
 docker tag <image> registry.digitalocean.com/<registry>/<repository>:<tag>
 docker push registry.digitalocean.com/<registry>/<repository>:<tag>
 ```
@@ -108,7 +110,8 @@ repository, Basic = 5).
 2. Recommend the token-based pattern, which needs no minted credential: the
    user creates a DigitalOcean API token (registry read/write scope), stores
    it as a CI secret such as `DIGITALOCEAN_ACCESS_TOKEN`, and the job runs
-   `doctl registries login --expiry-seconds 1200` before `docker push`. Each
+   `doctl registries login <registry> --expiry-seconds 1200` before
+   `docker push`. Each
    run gets a short-lived credential; nothing passes through this session.
    The CI/CD how-to above has provider-specific examples (for GitHub Actions,
    `digitalocean/action-doctl`); prefer it over reconstructing YAML from
@@ -130,7 +133,8 @@ Two supported paths. Recommend the first.
    namespace and adds it to each namespace's default service account. No
    `imagePullSecrets` needed in workloads. There is no MCP tool for this
    toggle; walk the user through the UI or the how-to.
-2. **Manual secret**: `doctl registries kubernetes-manifest | kubectl apply -f -`
+2. **Manual secret**:
+   `doctl registries kubernetes-manifest <registry> | kubectl apply -f -`
    creates secret `registry-<registry>`; or mint `docr-docker-credentials`
    (read-only, with expiry) and create the secret with
    `kubectl create secret generic <name> --from-file=.dockerconfigjson=<file> --type=kubernetes.io/dockerconfigjson`.
@@ -175,3 +179,24 @@ Work read-first, in this order:
 
 Do not mint new credentials as a first move; most pull failures are a wrong
 reference, an expired secret, or a deleted tag.
+
+## If MCP is not connected
+
+Most of this skill already runs through `doctl` on the user's machine
+(authenticate once with `doctl auth init`). The user runs these themselves;
+do not ask for their API token. The read checks in the troubleshooting steps
+map to:
+
+```shell
+doctl registries list
+doctl registries repository list-v2 <registry>
+doctl registries repository list-tags <registry> <repository>
+doctl registries garbage-collection get-active <registry>
+doctl registries garbage-collection list <registry>
+doctl registries login <registry> --expiry-seconds 3600         # add --read-only for pull-only
+doctl registries kubernetes-manifest <registry> | kubectl apply -f -
+doctl registries docker-config <registry> --expiry-seconds 3600  # prints a credential; last resort
+```
+
+`docker-config` writes the credential to the terminal, so the same exposure
+rules apply as for `docr-docker-credentials`.

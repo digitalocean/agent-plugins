@@ -12,7 +12,7 @@ description: >-
 metadata:
   author: digitalocean
   product: container-registry
-  version: "1.0"
+  version: "1.1"
 ---
 
 # DigitalOcean Container Registry (DOCR)
@@ -133,7 +133,10 @@ because they are the usual cause of surprising storage usage.
    retry fails with a name conflict; misreading that as "taken by someone
    else" leads to picking a different name and creating a second registry
    the user did not want.
-7. Hand off to **docr-access** so the user can log
+7. Verify. `docr-get` (`RegistryName`) and check that `region` is what the
+   user confirmed. If the plan was changed as part of the create, confirm
+   with `docr-subscription-get` too.
+8. Hand off to **docr-access** so the user can log
    in and push.
 
 ## Delete a registry
@@ -147,6 +150,8 @@ because they are the usual cause of surprising storage usage.
    destroying a registry mid-month can reduce prorated storage allowance (see
    pricing docs).
 4. `docr-delete` (`RegistryName`). Irreversible.
+5. Verify with `docr-list`: the registry is gone. If it still shows, wait a
+   moment and read again before retrying the delete.
 
 Deleting a registry does not change the subscription; the account keeps
 paying for the plan until `docr-subscription-update` changes it.
@@ -164,6 +169,8 @@ paying for the plan until `docr-subscription-update` changes it.
   If the target tier is not eligible, explain the reason and point the user
   to **docr-cleanup** (storage, repositories) or
   to deleting registries (`OverRegistryLimit`) before retrying.
+- Verify with `docr-subscription-get`: `tier.slug` is the one the user asked
+  for.
 - Storage over the plan quota is billed per GiB per day; untagged images count
   toward usage.
 
@@ -175,3 +182,25 @@ paying for the plan until `docr-subscription-update` changes it.
   not a name error. Check the plan before retrying.
 - A registry's region cannot be changed. Create a new registry and re-push.
 - Storage shown by `docr-get` lags deletes until garbage collection runs.
+
+## If MCP is not connected
+
+Use `doctl` (authenticate once with `doctl auth init`). The user runs these
+themselves; do not ask for their API token. The same safety rules apply: state
+the plan price before create, and confirm the exact registry name before
+delete.
+
+```shell
+doctl registries options subscription-tiers     # also: available-regions
+doctl registries list
+doctl registries get <registry>
+doctl registries create <registry> --subscription-tier <tier-slug> --region <region>
+doctl registries repository list-v2 <registry>
+doctl registries repository list-tags <registry> <repository>
+doctl registries repository list-manifests <registry> <repository>
+doctl registries delete <registry>               # prompts; --force skips the prompt, do not add it
+```
+
+There is no `doctl` command for the subscription plan itself. Point the user
+to the registry's **Settings** page in the control panel to view or change
+the plan.
