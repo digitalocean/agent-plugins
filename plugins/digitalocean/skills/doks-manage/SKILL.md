@@ -116,9 +116,10 @@ Global rules:
 2. `doks-get-cluster` (`ClusterID`) shows `status.state`, version, whether the
    control plane is highly available, and the auto-upgrade and surge-upgrade
    settings.
-3. `doks-list-nodepools` (`ClusterID`) shows each pool's size, count, and
-   autoscale range. `doks-get-nodepool` adds labels, taints, and the nodes with
-   their IDs and state.
+3. `doks-list-nodepools` (`ClusterID`) shows each pool's size, count, nodes,
+   labels, taints, and autoscale range. `doks-get-nodepool` returns the same
+   for one pool. The tools omit empty fields, so a missing `labels`, `taints`,
+   or `auto_scale` means none or off.
 
 Report `status.state` in plain words. `provisioning` and `upgrading` are
 normal and transient. `degraded` and `error` need attention: show the status
@@ -163,9 +164,10 @@ message and stop before changing anything.
 1. `doks-list-nodepools` and `doks-get-nodepool` first, so you know the
    current count, size, and autoscale settings.
 2. **Add a pool:** `doks-create-nodepool` (`cluster_id`,
-   `node_pool_create_request`). Take the `size` from `doks-list-options`. Price
-   first: size, count (or `max_nodes` when autoscaling), billed per second once
-   nodes are ready.
+   `node_pool_create_request`). If the user has not stated the pool name, size,
+   or node count, ask for them. Do not choose a size yourself. Take the `size`
+   from `doks-list-options`. Price first: size, count (or `max_nodes` when
+   autoscaling), billed per second once nodes are ready.
 3. **Resize or autoscale:** `doks-update-nodepool` (`ClusterID`, `NodePoolID`).
    - Set `Count` for a fixed size.
    - For autoscaling send `AutoScale: true` together with `MinNodes` and
