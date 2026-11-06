@@ -18,9 +18,9 @@ Argument names are PascalCase (`ClusterID`) on every tool except
 body in snake_case (`node_pools`, `auto_scale`). Always call `retrieve_schema`
 for them instead of guessing the shape.
 
-`invoke_tool`'s optional `projection` selects top-level fields of structured
-output (for example `["cluster"]` or `["node_pools"]`). It cannot reach into
-array elements. Errors come back as text, for example
+`invoke_tool`'s optional `projection` selects fields of structured output with
+dot paths, including inside arrays (for example `["cluster.status"]` or
+`["node_pools.name", "node_pools.nodes.status"]`). Errors come back as text, for example
 `failed to delete cluster: ...`.
 
 Risk column is the tier from the skill's safety rules: **Read**, **Confirm**,
