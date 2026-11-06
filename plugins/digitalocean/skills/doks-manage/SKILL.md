@@ -135,7 +135,8 @@ message and stop before changing anything.
    the account may be near a limit, link the limits page.
 3. Agree the shape with the user: cluster name, region, Kubernetes version,
    and for each node pool the size, node count, and whether it autoscales
-   (`min_nodes` / `max_nodes`).
+   (`min_nodes` / `max_nodes`). If the user has not stated one of these, ask.
+   You may suggest options from `doks-list-options`, but do not choose for them.
 4. **Price first.** Tell the user:
    - Each node is a Droplet of the chosen size, billed per second from when it
      is ready, even if it is unhealthy. With autoscaling, the cost ceiling is
@@ -165,7 +166,8 @@ message and stop before changing anything.
    current count, size, and autoscale settings.
 2. **Add a pool:** `doks-create-nodepool` (`cluster_id`,
    `node_pool_create_request`). If the user has not stated the pool name, size,
-   or node count, ask for them. Do not choose a size yourself. Take the `size`
+   node count, or whether it should autoscale (and the min and max), ask for
+   them. Do not choose a size yourself. Take the `size`
    from `doks-list-options`. Price first: size, count (or `max_nodes` when
    autoscaling), billed per second once nodes are ready.
 3. **Resize or autoscale:** `doks-update-nodepool` (`ClusterID`, `NodePoolID`).
@@ -192,10 +194,12 @@ message and stop before changing anything.
 ## Change cluster settings
 
 `doks-update-cluster` (`ClusterID`) accepts `Name`, `Tags`, `MaintenancePolicy`,
-`AutoUpgrade`, and `SurgeUpgrade`. Show the before and after, then confirm.
+`AutoUpgrade`, and `SurgeUpgrade`. Send only the fields the user asked to
+change. Show the before and after, then confirm.
 
 - `MaintenancePolicy` needs both `StartTime` (`HH:MM`) and `Day` (a weekday
-  name, or `any`). One without the other is rejected.
+  name, or `any`). One without the other is rejected. Ask the user for the day
+  and start time. Do not pick them.
 - `AutoUpgrade: true` lets DOKS apply patch upgrades inside the maintenance
   window, which replaces worker nodes. Say this before enabling it.
 - `SurgeUpgrade: true` makes upgrades create extra nodes first and needs spare
@@ -243,9 +247,10 @@ fashion, one pool at a time. It cannot be rolled back.
 `doks-delete-node` (`ClusterID`, `NodePoolID`, `NodeID`, `SkipDrain`,
 `Replace`) removes one worker node. Get the node ID from `doks-get-nodepool`.
 
-- `Replace: true` creates a new node in its place, so the pool keeps its
-  capacity. Use it for an unhealthy node. Without it the pool ends up one node
-  smaller.
+- Ask the user clearly: delete the node, or replace it? Do not choose for them.
+  - **Delete:** `Replace: false`. The pool ends up one node smaller.
+  - **Replace:** `Replace: true` creates a new node in its place, so the pool
+    keeps its capacity. The new node is billed.
 - By default the node is drained first and its pods are rescheduled. Only set
   `SkipDrain: true` when the user says the node is unresponsive and accepts
   that its pods may be dropped.
@@ -254,8 +259,8 @@ fashion, one pool at a time. It cannot be rolled back.
   `doks-get-nodepool`: the old node is gone, a replacement reaches a running
   state when `Replace` was set, and `count` is what the user expects.
 - `doks-recycle-nodes` also replaces named nodes, but the underlying API is
-  deprecated. Prefer `doks-delete-node` with `Replace: true` unless the user
-  asks for recycle.
+  deprecated. When the user wants a node replaced, use `doks-delete-node` with
+  `Replace: true` and do not call `doks-recycle-nodes` unless they ask for it.
 
 ## Delete a node pool or cluster
 
