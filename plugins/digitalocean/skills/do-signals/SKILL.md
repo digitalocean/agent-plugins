@@ -273,9 +273,9 @@ before enabling Signals there again.
    Pass it only when this conversation already contains that confirmation
    and doctl cannot prompt because there is no terminal.
 4. Run `doctl signals deletion create --help` before using a flag this skill
-   does not show. `--type` is required. Leave `--team-id` unset unless the
-   command says it could not detect the team, and then use only the team id
-   from `doctl account get`. Then:
+   does not show. `--type` is required. Do not pass `--team-id`. doctl
+   detects the team by reading Signals consents. If doctl can't detect the
+   team, treat that like a 403: name `signals:query` and stop. Then:
 
    ```shell
    doctl signals deletion create --type agent --environment-id <environment-id>
