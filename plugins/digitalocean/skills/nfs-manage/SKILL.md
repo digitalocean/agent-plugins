@@ -109,8 +109,10 @@ Example: "Shared storage for three web Droplets in `atl1`."
 
 1. Check the region on the availability page. Clients mount only through an
    attached VPC network in the share's region.
-2. Agree the tier and check the size against that tier's minimum on the
-   limits page.
+2. Agree the tier. Standard starts at 50 GiB. High Performance starts at
+   500 GiB. Do not create a High Performance share below 500 GiB. The create
+   tool only rejects sizes under 50 GiB, so it will not catch this. The
+   maximum and the other limits are on the limits page.
 3. `nfs-file-share-list` for `atl1`. Use a lowercase name with dashes, such
    as `web-assets`.
 4. State the size, tier, region, monthly cost, and that billing is on
@@ -137,10 +139,10 @@ Example: "Upgrade `ml-datasets` to High Performance."
 
 1. `nfs-file-share-get`. Only Standard to High Performance works. A downgrade
    is rejected, so the change lasts until the share is deleted.
-2. If the share is below the High Performance minimum on the limits page, the
-   switch also grows it to that minimum.
-3. State the new monthly cost, using the larger of the current size and that
-   minimum, at the High Performance price.
+2. If the share is below 500 GiB, the switch grows it to 500 GiB. A share
+   cannot shrink after that.
+3. State the new monthly cost for the larger of the current size and 500 GiB,
+   at the High Performance price.
 4. `nfs-switch-performance-tier` with `high`. Verify the tier and the size.
 
 ## Attach, detach, or move
