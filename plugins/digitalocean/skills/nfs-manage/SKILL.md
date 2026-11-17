@@ -30,14 +30,17 @@ or prices from memory.
 ## Use something else when
 
 - One Droplet needs its own disk. That is Volumes Block Storage.
-- The share belongs to DOKS: its name starts with `pvc-`, or
-  `nfs-file-share-get` shows a `manager_urn`. Resize or remove it with
-  `kubectl`. These tools leave the cluster out of sync with the share.
+- The share belongs to DOKS when its name starts with `pvc-`. Resize or
+  remove it with `kubectl`. These tools leave the cluster out of sync with
+  the share.
+- `nfs-file-share-get` shows a `manager_urn`. Another service manages that
+  share. Ask before changing it.
 - The user wants files over HTTP or an S3-compatible API. That is Spaces.
 
 ## Docs
 
-Link these. Do not restate prices or limits.
+Link these. Do not restate prices or limits. The 500 GiB tier-switch
+growth below is the exception.
 
 | Need | Fetch |
 | --- | --- |
@@ -109,10 +112,8 @@ Example: "Shared storage for three web Droplets in `atl1`."
 
 1. Check the region on the availability page. Clients mount only through an
    attached VPC network in the share's region.
-2. Agree the tier. Standard starts at 50 GiB. High Performance starts at
-   500 GiB. Do not create a High Performance share below 500 GiB. The create
-   tool only rejects sizes under 50 GiB, so it will not catch this. The
-   maximum and the other limits are on the limits page.
+2. Agree the tier and check the size against that tier's minimum on the
+   limits page. The API rejects a High Performance share below its minimum.
 3. `nfs-file-share-list` for `atl1`. Use a lowercase name with dashes, such
    as `web-assets`.
 4. State the size, tier, region, monthly cost, and that billing is on
@@ -126,7 +127,8 @@ Example: "Shared storage for three web Droplets in `atl1`."
 
 Example: "Take `web-assets` to 2048 GiB."
 
-1. `nfs-file-share-get`. If it belongs to DOKS, stop and point to `kubectl`.
+1. `nfs-file-share-get`. If the name starts with `pvc-`, stop and point to
+   `kubectl`. If `manager_urn` is set, ask before resizing.
 2. The new size must be larger. A share cannot shrink. A smaller size can be
    accepted and then change nothing. Never send a size at or below the
    current one.
@@ -173,7 +175,8 @@ snapshot name, then `nfs-snapshot-delete`.
 
 ## Delete a share
 
-1. `nfs-file-share-get`. If it belongs to DOKS, stop.
+1. `nfs-file-share-get`. If the name starts with `pvc-`, stop. If
+   `manager_urn` is set, ask before deleting.
 2. `nfs-snapshot-list` for the share ID. The API refuses to delete a share
    that still has snapshots. The user agrees to delete each one first.
 3. The user unmounts the share on every client.
@@ -191,8 +194,9 @@ delete unless the user names the share.
 ## doctl fallback
 
 Use `doctl` only when the MCP server is not connected. `doctl account get`
-must succeed first. The safety rules above still apply. `delete` does not
-prompt. Run it only after the user confirmed that share.
+must succeed first. The safety rules above still apply. `doctl nfs delete`
+and `doctl nfs snapshot delete` do not prompt. Run either only after the
+user confirmed the exact name.
 
 | Task | Command |
 | --- | --- |
